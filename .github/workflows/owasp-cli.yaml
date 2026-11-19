@@ -1,23 +1,31 @@
-name: Dependency Security Scan
+name: CVE Lite Security Scan
 
 on:
-  pull_request:
   push:
     branches: [main]
+  pull_request:
+  schedule:
+    - cron: "0 2 * * 1"
 
 permissions:
   contents: read
+  security-events: write
 
 jobs:
-  security:
+  security-scan:
+    name: Dependency Vulnerability Scan
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v6
-
-      - uses: OWASP/cve-lite-cli@v1
+      - name: Checkout Repository
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          all: "true"
-          verbose: "true"
+          persist-credentials: false
+
+      - name: OWASP CVE Lite Scan
+        uses: OWASP/cve-lite-cli@af3a5f9677aeb21640c1df301495e8a8b98f8312 # v1
+        with:
+          all: true
+          verbose: true
           fail-on: high
-          sarif: "true"
+          sarif: true
